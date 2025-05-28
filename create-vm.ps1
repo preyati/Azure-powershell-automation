@@ -1,12 +1,18 @@
+param(
+    [string]$vmUsername,
+    [string]$vmPassword
+)
+
 # Set variables
 $resourceGroup = "demoRG"
 $location = "canadacentral"
 $vmName = "WinVM"
-$username = "azureuser"
-$password = ConvertTo-SecureString "Pkd@1012122000" -AsPlainText -Force
-$cred = New-Object System.Management.Automation.PSCredential ($username, $password)
 
-# Login to Azure (only needed when running locally)
+# Convert plain password to secure string
+$password = ConvertTo-SecureString $vmPassword -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential ($vmUsername, $password)
+
+# Login to Azure (only if running locally)
 #if (-not (Get-AzContext)) {
 #    Connect-AzAccount
 #}
@@ -25,5 +31,4 @@ New-AzVm `
     -PublicIpAddressName "${vmName}PublicIP" `
     -Credential $cred `
     -ImageName "Win2019Datacenter" `
-    -OpenPorts 80,3389 `
-
+    -OpenPorts 80,3389
