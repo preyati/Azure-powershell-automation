@@ -3,33 +3,28 @@ name: Create Azure VM
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main  # Replace with your default branch if different
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install PowerShell
-        run: sudo snap install powershell --classic
+      - name: Set up PowerShell
+        uses: PowerShell/setup-powershell@v2
 
       - name: Login to Azure using Service Principal
         uses: azure/login@v1
         with:
-          creds: |
-            {
-              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
-              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
-              "tenantId": "${{ secrets.AZURE_TENANT_ID }}",
-              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-            }
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Run PowerShell script to create VM
         shell: pwsh
         env:
           VM_USERNAME: ${{ secrets.VM_USERNAME }}
           VM_PASSWORD: ${{ secrets.VM_PASSWORD }}
-        run: pwsh ./create-vm.ps1 -vmUsername $env:VM_USERNAME -vmPassword $env:VM_PASSWORD
+        run: |
+          ./create-vm.ps1 -vmUsername $env:VM_USERNAME -vmPassword $env:VM_PASSWORD
