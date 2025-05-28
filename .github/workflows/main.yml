@@ -3,10 +3,10 @@ name: Create Azure VM
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main
 
 jobs:
-  build:
+  create-vm:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,12 +16,6 @@ jobs:
       - name: Install PowerShell
         run: sudo snap install powershell --classic
 
-      - name: Install Az PowerShell module
-        shell: pwsh
-        run: |
-          Install-Module -Name Az -Force -Scope CurrentUser -AllowClobber
-          Import-Module Az
-
       - name: Login to Azure using Service Principal
         uses: azure/login@v1
         with:
@@ -30,7 +24,10 @@ jobs:
       - name: Run PowerShell script to create VM
         shell: pwsh
         env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           VM_USERNAME: ${{ secrets.VM_USERNAME }}
           VM_PASSWORD: ${{ secrets.VM_PASSWORD }}
-        run: |
-          ./create-vm.ps1 -vmUsername $env:VM_USERNAME -vmPassword $env:VM_PASSWORD
+        run: ./create-vm.ps1 -vmUsername $env:VM_USERNAME -vmPassword $env:VM_PASSWORD
