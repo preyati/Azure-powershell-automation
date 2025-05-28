@@ -3,7 +3,7 @@ name: Create Azure VM
 on:
   push:
     branches:
-      - main
+      - main  # or your default branch
 
 jobs:
   create-vm:
@@ -12,9 +12,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      
       - name: Install PowerShell
         run: sudo snap install powershell --classic
+
+      - name: Install Azure PowerShell Az module
+        shell: pwsh
+        run: |
+          Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
 
       - name: Login to Azure using Service Principal
         uses: azure/login@v1
@@ -31,3 +36,4 @@ jobs:
           VM_USERNAME: ${{ secrets.VM_USERNAME }}
           VM_PASSWORD: ${{ secrets.VM_PASSWORD }}
         run: ./create-vm.ps1 -vmUsername $env:VM_USERNAME -vmPassword $env:VM_PASSWORD
+
