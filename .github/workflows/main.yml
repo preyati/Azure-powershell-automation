@@ -3,7 +3,7 @@ name: Create Azure VM
 on:
   push:
     branches:
-      - main  # Replace with your default branch if different
+      - main  # or your default branch
 
 jobs:
   build:
@@ -15,6 +15,12 @@ jobs:
 
       - name: Install PowerShell
         run: sudo snap install powershell --classic
+
+      - name: Install Az PowerShell module
+        shell: pwsh
+        run: |
+          Install-Module -Name Az -Force -Scope CurrentUser -AllowClobber
+          Import-Module Az
 
       - name: Login to Azure using Service Principal
         uses: azure/login@v1
